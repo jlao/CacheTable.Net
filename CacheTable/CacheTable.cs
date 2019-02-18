@@ -67,10 +67,6 @@ namespace CacheTable
             }
         }
 
-        public ICollection<TKey> Keys => throw new NotImplementedException();
-
-        public ICollection<TValue> Values => throw new NotImplementedException();
-
         public int Count => this.count;
 
         public void Clear()
@@ -84,11 +80,6 @@ namespace CacheTable
         }
 
         public bool ContainsKey(TKey key) => this.FindEntry(key) >= 0;
-
-        public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
-        {
-            throw new NotImplementedException();
-        }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
