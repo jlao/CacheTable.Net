@@ -41,13 +41,10 @@ namespace CacheTable
                 int empty = -1;
                 for (int i = row; i < end; i++)
                 {
-                    if (this.table[i].HasValue)
+                    if (this.table[i].HasValue && this.table[i].Value.Key.Equals(key))
                     {
-                        if (this.table[i].Value.Key.Equals(key))
-                        {
-                            this.table[i] = kvp;
-                            return;
-                        }
+                        this.table[i] = kvp;
+                        return;
                     }
                     else if (empty < 0)
                     {
@@ -62,6 +59,7 @@ namespace CacheTable
                     return;
                 }
 
+                // No empty slot, randomly replace.
                 int loc = row + this.rng.Next(this.numColumns);
                 this.table[loc] = kvp;
             }
