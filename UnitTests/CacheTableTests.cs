@@ -2,6 +2,7 @@ using CacheTable;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace UnitTests
@@ -122,6 +123,20 @@ namespace UnitTests
                 table[i] = i + 1;
                 table.Count.Should().Be(4);
             }
+        }
+
+        [Fact]
+        public void Enumerate()
+        {
+            var table = new CacheTable<int, int>(10, 4);
+            for (int i = 0; i < 4; i++)
+            {
+                table[i] = i;
+            }
+
+            List<KeyValuePair<int, int>> actual = table.ToList();
+            List<KeyValuePair<int, int>> expected = Enumerable.Range(0, 4).Select(i => new KeyValuePair<int, int>(i, i)).ToList();
+            actual.Should().BeEquivalentTo(expected);
         }
     }
 }

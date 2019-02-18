@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace CacheTable
 {
-    public class CacheTable<TKey, TValue>
+    public class CacheTable<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     {
         private readonly KeyValuePair<TKey, TValue>?[] table;
         private readonly int numRows;
@@ -73,8 +73,6 @@ namespace CacheTable
 
         public int Count => this.count;
 
-        public bool IsReadOnly => false;
-
         public void Clear()
         {
             for (int i = 0; i < this.table.Length; i++)
@@ -94,8 +92,16 @@ namespace CacheTable
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < this.table.Length; i++)
+            {
+                if (table[i].HasValue)
+                {
+                    yield return table[i].Value;
+                }
+            }
         }
+
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
         public bool Remove(TKey key)
         {
