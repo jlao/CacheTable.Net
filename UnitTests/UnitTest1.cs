@@ -1,6 +1,7 @@
 using CacheTable;
 using FluentAssertions;
 using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace UnitTests
@@ -17,11 +18,58 @@ namespace UnitTests
         }
 
         [Fact]
+        public void TryGetNonExistentValue()
+        {
+            var table = new CacheTable<int, int>(10, 4);
+            table.TryGetValue(1, out int val).Should().BeFalse();
+            val.Should().Be(default(int));
+        }
+
+        [Fact]
         public void SetAndIndex()
         {
             var table = new CacheTable<int, int>(10, 4);
             table[1] = 2;
             table[1].Should().Be(2);
+        }
+
+        [Fact]
+        public void Update()
+        {
+            var table = new CacheTable<int, int>(10, 4);
+            
+            for (int i = 0; i < 4; i++)
+            {
+                table[i] = i;
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                table[i] = i + 1;
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                table[i].Should().Be(i + 1);
+            }
+        }
+
+        [Fact]
+        public void IndexNonExistentKeyThrows()
+        {
+            var table = new CacheTable<int, int>(10, 4);
+            Action act = () => Console.WriteLine(table[0]);
+            act.Should().Throw<KeyNotFoundException>()
+                .WithMessage("No value found for 0");
+        }
+
+        [Fact]
+        public void ContainsKey()
+        {
+            var table = new CacheTable<int, int>(10, 4);
+            table.ContainsKey(0).Should().BeFalse();
+            table[0] = 1;
+            table.ContainsKey(0).Should().BeTrue();
         }
 
         [Fact]
@@ -32,6 +80,7 @@ namespace UnitTests
             table.Remove(1).Should().BeTrue();
             table.TryGetValue(1, out int val).Should().BeFalse();
             val.Should().Be(default(int));
+            table.Remove(1).Should().BeFalse();
         }
 
         [Fact]
@@ -54,6 +103,25 @@ namespace UnitTests
             }
 
             table.Count.Should().Be(0);
+        }
+
+        [Fact]
+        public void Count()
+        {
+            var table = new CacheTable<int, int>(10, 4);
+            table.Count.Should().Be(0);
+
+            for (int i = 0; i < 4; i++)
+            {
+                table[i] = i;
+                table.Count.Should().Be(i + 1);
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                table[i] = i + 1;
+                table.Count.Should().Be(4);
+            }
         }
     }
 }
