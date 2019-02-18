@@ -140,7 +140,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void LoadTest()
+        public void InsertOnFullTableOverwrites()
         {
             var table = new CacheTable<int, int>(5, 4);
 
