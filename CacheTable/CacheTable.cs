@@ -36,15 +36,18 @@ namespace CacheTable
             set
             {
                 var kvp = new KeyValuePair<TKey, TValue>(key, value);
-                int row = this.FindRow(key);
-                int end = row + this.numColumns;
+                (int start, int end) = this.FindRow(key);
                 int empty = -1;
-                for (int i = row; i < end; i++)
+
+                for (int i = start; i < end; i++)
                 {
-                    if (this.table[i].HasValue && this.table[i].Value.Key.Equals(key))
+                    if (this.table[i].HasValue)
                     {
-                        this.table[i] = kvp;
-                        return;
+                        if (this.table[i].Value.Key.Equals(key))
+                        {
+                            this.table[i] = kvp;
+                            return;
+                        }
                     }
                     else if (empty < 0)
                     {
@@ -54,13 +57,18 @@ namespace CacheTable
 
                 if (empty >= 0)
                 {
+                    Debug.Assert(!this.table[empty].HasValue);
+
                     this.table[empty] = kvp;
                     this.count++;
+                    Debug.Assert(this.count <= (this.numRows * this.numColumns));
                     return;
                 }
 
                 // No empty slot, randomly replace.
-                int loc = row + this.rng.Next(this.numColumns);
+                int loc = start + this.rng.Next(this.numColumns);
+                Debug.Assert(this.table[loc].HasValue);
+                Debug.Assert(!this.table[loc].Value.Key.Equals(key));
                 this.table[loc] = kvp;
             }
         }
@@ -122,9 +130,8 @@ namespace CacheTable
 
         private int FindEntry(TKey key)
         {
-            int row = this.FindRow(key);
-            int end = row + this.numColumns;
-            for (int i = row; i < end; i++)
+            (int start, int end) = this.FindRow(key);
+            for (int i = start; i < end; i++)
             {
                 if (this.table[i].HasValue && this.table[i].Value.Key.Equals(key))
                 {
@@ -135,10 +142,13 @@ namespace CacheTable
             return -1;
         }
 
-        private int FindRow(TKey key)
+        private (int start, int end) FindRow(TKey key)
         {
             int hash = key.GetHashCode() & 0x7FFFFFFF;
-            return hash % this.numRows;
+            int row = hash % this.numRows;
+            int start = row * this.numColumns;
+            int end = start + this.numColumns;
+            return (start, end);
         }
     }
 }

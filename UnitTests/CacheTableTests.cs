@@ -138,5 +138,32 @@ namespace UnitTests
             List<KeyValuePair<int, int>> expected = Enumerable.Range(0, 4).Select(i => new KeyValuePair<int, int>(i, i)).ToList();
             actual.Should().BeEquivalentTo(expected);
         }
+
+        [Fact]
+        public void LoadTest()
+        {
+            var table = new CacheTable<int, int>(5, 4);
+
+            int i = 0;
+            do
+            {
+                table[i] = i;
+                i++;
+            } while (table.Count < 20);
+
+            table.Count.Should().Be(20);
+
+            HashSet<int> before = table.Select(kvp => kvp.Value).ToHashSet();
+            table[i] = i;
+
+            // The last insertion should overwrite a value so count should still be 20.
+            table.Count.Should().Be(20);
+
+            // There should be one new element.
+            HashSet<int> after = table.Select(kvp => kvp.Value).ToHashSet();
+            after.ExceptWith(before);
+            after.Count.Should().Be(1);
+            after.First().Should().Be(i);
+        }
     }
 }
