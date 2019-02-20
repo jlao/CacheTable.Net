@@ -30,17 +30,22 @@ namespace CacheTable
             this.count = 0;
         }
 
-        public (int row, int start, int end) FindRow(TKey key)
+        public int FindRow(TKey key)
         {
             int hash = key.GetHashCode() & 0x7FFFFFFF;
-            int row = hash % this.numRows;
-            int start = row * this.numColumns;
-            int end = start + this.numColumns;
-            return (row, start, end);
+            return hash % this.numRows;
         }
 
-        public int FindEntry(TKey key, int rowStart, int rowEnd)
+        private (int start, int end) GetRowRange(int row)
         {
+            int start = row * this.numColumns;
+            int end = start + this.numColumns;
+            return (start, end);
+        }
+
+        public int FindEntry(TKey key, int row)
+        {
+            (int rowStart, int rowEnd) = this.GetRowRange(row);
             for (int i = rowStart; i < rowEnd; i++)
             {
                 if (this.table[i].HasValue && this.table[i].Value.Key.Equals(key))
@@ -52,8 +57,9 @@ namespace CacheTable
             return -1;
         }
 
-        public bool TryGetValue(int loc, out TValue value)
+        public bool TryGetValue(TKey key, int row, out TValue value)
         {
+            int loc = this.FindEntry(key, row);
             if (loc >= 0)
             {
                 KeyValuePair<TKey, TValue>? item = table[loc];
@@ -66,8 +72,9 @@ namespace CacheTable
             return false;
         }
 
-        public bool Remove(int loc)
+        public bool Remove(TKey key, int row)
         {
+            int loc = this.FindEntry(key, row);
             if (loc < 0)
             {
                 return false;
@@ -89,8 +96,9 @@ namespace CacheTable
             }
         }
 
-        public void Set(TKey key, TValue value, int rowStart, int rowEnd, Random rng)
+        public void Set(TKey key, TValue value, int row, Random rng)
         {
+            (int rowStart, int rowEnd) = this.GetRowRange(row);
             var kvp = new KeyValuePair<TKey, TValue>(key, value);
             int empty = -1;
 

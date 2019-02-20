@@ -31,8 +31,7 @@ namespace CacheTable
 
             set
             {
-                (_, int rowStart, int rowEnd) = this.table.FindRow(key);
-                this.table.Set(key, value, rowStart, rowEnd, this.rng);
+                this.table.Set(key, value, this.table.FindRow(key), this.rng);
             }
         }
 
@@ -43,8 +42,7 @@ namespace CacheTable
 
         public bool ContainsKey(TKey key)
         {
-            (_, int rowStart, int rowEnd) = this.table.FindRow(key);
-            return this.table.FindEntry(key, rowStart, rowEnd) >= 0;
+            return this.table.FindEntry(key, this.table.FindRow(key)) >= 0;
         }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
@@ -56,16 +54,12 @@ namespace CacheTable
 
         public bool Remove(TKey key)
         {
-            (_, int rowStart, int rowEnd) = this.table.FindRow(key);
-            int loc = this.table.FindEntry(key, rowStart, rowEnd);
-            return this.table.Remove(loc);
+            return this.table.Remove(key, this.table.FindRow(key));
         }
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            (_, int rowStart, int rowEnd) = this.table.FindRow(key);
-            int loc = this.table.FindEntry(key, rowStart, rowEnd);
-            return this.table.TryGetValue(loc, out value);
+            return this.table.TryGetValue(key, this.table.FindRow(key), out value);
         }
     }
 }
