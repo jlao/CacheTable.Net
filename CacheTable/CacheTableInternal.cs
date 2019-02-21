@@ -36,7 +36,7 @@ namespace CacheTable
             return hash % this.numRows;
         }
 
-        private (int start, int end) GetRowRange(int row)
+        public (int start, int end) GetRowRange(int row)
         {
             int start = row * this.numColumns;
             int end = start + this.numColumns;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace CacheTable
 {
-    public class CacheTable<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
+    public class CacheTable<TKey, TValue> : ICacheTable<TKey, TValue>
     {
         private CacheTableInternal<TKey, TValue> table;
         private readonly Random rng = new Random();
