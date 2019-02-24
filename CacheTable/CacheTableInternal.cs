@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Threading;
 
 namespace CacheTable
 {
@@ -10,7 +11,7 @@ namespace CacheTable
         public readonly KeyValuePair<TKey, TValue>?[] table;
         public readonly int numRows;
         public readonly int numColumns;
-        public int count;
+        public volatile int count;
 
         public CacheTableInternal(int numRows, int numColumns)
         {
@@ -81,7 +82,7 @@ namespace CacheTable
             }
 
             this.table[loc] = null;
-            this.count--;
+            Interlocked.Decrement(ref this.count);
             return true;
         }
 
@@ -123,7 +124,7 @@ namespace CacheTable
                 Debug.Assert(!this.table[empty].HasValue);
 
                 this.table[empty] = kvp;
-                this.count++;
+                Interlocked.Increment(ref this.count);
                 Debug.Assert(this.count <= (this.numRows * this.numColumns));
                 return;
             }
