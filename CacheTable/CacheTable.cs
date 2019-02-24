@@ -7,6 +7,7 @@ namespace CacheTable
     public class CacheTable<TKey, TValue> : ICacheTable<TKey, TValue>
     {
         private CacheTableInternal<TKey, TValue> table;
+        private int count;
         private readonly Random rng = new Random();
 
         public CacheTable(int rows, int columns)
@@ -14,7 +15,7 @@ namespace CacheTable
             this.table = new CacheTableInternal<TKey, TValue>(rows, columns);
         }
 
-        public int Count => this.table.count;
+        public int Count => this.count;
 
         public TValue this[TKey key]
         {
@@ -31,13 +32,17 @@ namespace CacheTable
 
             set
             {
-                this.table.Set(key, value, this.table.FindRow(key), this.rng);
+                if (this.table.Set(key, value, this.table.FindRow(key), this.rng))
+                {
+                    this.count++;
+                }
             }
         }
 
         public void Clear()
         {
             this.table.Clear();
+            this.count = 0;
         }
 
         public bool ContainsKey(TKey key)
@@ -54,7 +59,13 @@ namespace CacheTable
 
         public bool Remove(TKey key)
         {
-            return this.table.Remove(key, this.table.FindRow(key));
+            if (this.table.Remove(key, this.table.FindRow(key)))
+            {
+                this.count--;
+                return true;
+            }
+
+            return false;
         }
 
         public bool TryGetValue(TKey key, out TValue value)

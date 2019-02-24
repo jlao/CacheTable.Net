@@ -7,13 +7,15 @@ namespace CacheTable
 {
     public class ConcurrentCacheTable<TKey, TValue> : ICacheTable<TKey, TValue>
     {
-        private CacheTableInternal<TKey, TValue> table;
+        private readonly CacheTableInternal<TKey, TValue> table;
         private readonly object[] lockObjects;
         private readonly Random[] rngs;
+        private readonly int[] counts;
 
         public ConcurrentCacheTable(int rows, int columns, int concurrency)
         {
             this.table = new CacheTableInternal<TKey, TValue>(rows, columns);
+            this.counts = new int[rows];
 
             this.lockObjects = new object[concurrency];
             for (int i = 0; i < concurrency; i++)
@@ -28,7 +30,27 @@ namespace CacheTable
             }
         }
 
-        public int Count => this.table.count;
+        public int Count
+        {
+            get
+            {
+                this.AcquireAllLocks();
+                try
+                {
+                    int count = 0;
+                    for (int i = 0; i < this.counts.Length; i++)
+                    {
+                        count += this.counts[i];
+                    }
+
+                    return count;
+                }
+                finally
+                {
+                    this.ReleaseAllLocks();
+                }
+            }
+        }
 
         public TValue this[TKey key]
         {
@@ -48,7 +70,10 @@ namespace CacheTable
                 int row = this.table.FindRow(key);
                 lock (this.GetLockObjectForRow(row))
                 {
-                    this.table.Set(key, value, row, this.GetRng(row));
+                    if (this.table.Set(key, value, row, this.GetRng(row)))
+                    {
+                        this.counts[row]++;
+                    }
                 }
             }
         }
@@ -59,6 +84,10 @@ namespace CacheTable
             try
             {
                 this.table.Clear();
+                for (int i = 0; i < this.counts.Length; i++)
+                {
+                    this.counts[i] = 0;
+                }
             }
             finally
             {
@@ -103,7 +132,13 @@ namespace CacheTable
             int row = this.table.FindRow(key);
             lock (this.GetLockObjectForRow(row))
             {
-                return this.table.Remove(key, row);
+                if (this.table.Remove(key, row))
+                {
+                    this.counts[row]--;
+                    return true;
+                }
+
+                return false;
             }
         }
 

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
-using System.Threading;
 
 namespace CacheTable
 {
@@ -11,14 +9,12 @@ namespace CacheTable
         public readonly KeyValuePair<TKey, TValue>?[] table;
         public readonly int numRows;
         public readonly int numColumns;
-        public volatile int count;
 
         public CacheTableInternal(int numRows, int numColumns)
         {
             this.numRows = numRows;
             this.numColumns = numColumns;
             this.table = new KeyValuePair<TKey, TValue>?[numRows * numColumns];
-            this.count = 0;
         }
 
         public void Clear()
@@ -27,8 +23,6 @@ namespace CacheTable
             {
                 this.table[i] = null;
             }
-
-            this.count = 0;
         }
 
         public int FindRow(TKey key)
@@ -82,7 +76,6 @@ namespace CacheTable
             }
 
             this.table[loc] = null;
-            Interlocked.Decrement(ref this.count);
             return true;
         }
 
@@ -97,7 +90,8 @@ namespace CacheTable
             }
         }
 
-        public void Set(TKey key, TValue value, int row, Random rng)
+        // Returns true if item was inserted into empty slot. False otherwise.
+        public bool Set(TKey key, TValue value, int row, Random rng)
         {
             (int rowStart, int rowEnd) = this.GetRowRange(row);
             var kvp = new KeyValuePair<TKey, TValue>(key, value);
@@ -110,7 +104,7 @@ namespace CacheTable
                     if (this.table[i].Value.Key.Equals(key))
                     {
                         this.table[i] = kvp;
-                        return;
+                        return false;
                     }
                 }
                 else if (empty < 0)
@@ -124,9 +118,7 @@ namespace CacheTable
                 Debug.Assert(!this.table[empty].HasValue);
 
                 this.table[empty] = kvp;
-                Interlocked.Increment(ref this.count);
-                Debug.Assert(this.count <= (this.numRows * this.numColumns));
-                return;
+                return true;
             }
 
             // No empty slot, randomly replace.
@@ -134,6 +126,7 @@ namespace CacheTable
             Debug.Assert(this.table[loc].HasValue);
             Debug.Assert(!this.table[loc].Value.Key.Equals(key));
             this.table[loc] = kvp;
+            return false;
         }
     }
 }
