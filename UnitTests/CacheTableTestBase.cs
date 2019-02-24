@@ -4,11 +4,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace UnitTests
 {
     public abstract class CacheTableTestBase<TCacheTable> where TCacheTable : ICacheTable<int, int>
     {
+        protected ITestOutputHelper output;
+
+        protected CacheTableTestBase(ITestOutputHelper output)
+        {
+            this.output = output;
+        }
+
         protected abstract TCacheTable CreateTable(int numRows, int numColumns);
 
         [Fact]
@@ -55,6 +63,10 @@ namespace UnitTests
             {
                 table[i].Should().Be(i + 1);
             }
+
+            var expected = Enumerable.Range(0, 4).Select(i => new KeyValuePair<int, int>(i, i + 1)).ToList();
+            var actual = table.ToList();
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
