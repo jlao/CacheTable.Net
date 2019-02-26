@@ -19,11 +19,8 @@ steps:
 - script: dotnet build
   displayName: 'Build'
 
-- script: dotnet test
-  displayName: 'Run tests'
-
-
 - task: DotNetCoreCLI@2
+  displayName: 'Run tests'
   inputs:
     command: test
     projects: 'UnitTests/UnitTests.csproj'
