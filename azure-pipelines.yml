@@ -30,3 +30,5 @@ steps:
   displayName: 'Package'
   inputs:
     command: pack
+
+- task: PublishBuildArtifacts@1
