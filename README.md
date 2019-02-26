@@ -1,0 +1,1 @@
+[![Build Status](https://jlao.visualstudio.com/CacheTable.Net/_apis/build/status/jlao.CacheTable.Net?branchName=master)](https://jlao.visualstudio.com/CacheTable.Net/_build/latest?definitionId=1&branchName=master)
