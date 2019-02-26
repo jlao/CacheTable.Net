@@ -25,3 +25,8 @@ steps:
     command: test
     projects: 'UnitTests/UnitTests.csproj'
     arguments: '--configuration $(buildConfiguration)'
+
+- task: NuGetCommand@2
+  inputs:
+    command: pack
+    packagesToPack: '**/*.csproj'

@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>James Lao</Authors>
+    <Company />
+    <Product>CacheTable.Net</Product>
+    <PackageId>CacheTable.Net</PackageId>
+    <PackageProjectUrl>https://github.com/jlao/CacheTable.Net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jlao/CacheTable.Net</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
 </Project>
