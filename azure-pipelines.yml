@@ -26,7 +26,7 @@ steps:
     projects: 'UnitTests/UnitTests.csproj'
     arguments: '--configuration $(buildConfiguration)'
 
-- task: NuGetCommand@2
+- task: DotNetCoreCLI@2
+  displayName: 'Package'
   inputs:
     command: pack
-    packagesToPack: '**/*.csproj'
