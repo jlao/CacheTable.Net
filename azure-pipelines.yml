@@ -25,3 +25,10 @@ steps:
     command: test
     projects: 'UnitTests/UnitTests.csproj'
     arguments: '--configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Package'
+  inputs:
+    command: pack
+
+- task: PublishBuildArtifacts@1
