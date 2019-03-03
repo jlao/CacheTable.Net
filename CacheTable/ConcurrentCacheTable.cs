@@ -154,6 +154,16 @@ namespace CacheTable
             }
         }
 
+        /// <summary>
+        /// Returns an enumerator that iterates through the cache.
+        /// </summary>
+        /// <returns>An enumerator for the cache.</returns>
+        /// <remarks>
+        /// The enumerator is thread-safe but does not represent a
+        /// moment-in-time snapshot of the cache. Only one lock is held at a
+        /// time during the enumeration. Thus, the cache can be modified while
+        /// being enumerated over.
+        /// </remarks>
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             for (int lockNum = 0; lockNum < this.lockObjects.Length; lockNum++)
@@ -175,6 +185,16 @@ namespace CacheTable
             }
         }
 
+        /// <summary>
+        /// Returns an enumerator that iterates through the cache.
+        /// </summary>
+        /// <returns>An enumerator for the cache.</returns>
+        /// <remarks>
+        /// The enumerator is thread-safe but does not represent a
+        /// moment-in-time snapshot of the cache. Only one lock is held at a
+        /// time during the enumeration. Thus, the cache can be modified while
+        /// being enumerated over.
+        /// </remarks>
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
         /// <summary>

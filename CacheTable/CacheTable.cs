@@ -84,11 +84,19 @@ namespace CacheTable
             return this.table.FindEntry(key, this.table.FindRow(key)) >= 0;
         }
 
+        /// <summary>
+        /// Returns an enumerator that iterates through the cache.
+        /// </summary>
+        /// <returns>An enumerator for the cache.</returns>
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             return this.table.GetEnumerator();
         }
 
+        /// <summary>
+        /// Returns an enumerator that iterates through the cache.
+        /// </summary>
+        /// <returns>An enumerator for the cache.</returns>
         IEnumerator IEnumerable.GetEnumerator() => this.table.GetEnumerator();
 
         /// <summary>
