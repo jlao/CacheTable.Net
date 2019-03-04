@@ -30,5 +30,6 @@ steps:
   displayName: 'Package'
   inputs:
     command: pack
+    packagesToPack: 'CacheTable/CacheTable.csproj'
 
 - task: PublishBuildArtifacts@1
