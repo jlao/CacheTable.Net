@@ -5,9 +5,6 @@
   <PropertyGroup>
     <!-- edit this value to change the current major.minor version -->
     <VersionPrefix>0.1</VersionPrefix>
- 
-    <!-- append the build number if it is available -->
-    <VersionPrefix Condition=" '$(BUILD_BUILDID)' != '' ">$(VersionPrefix).$(BUILD_BUILDID)</VersionPrefix>
   </PropertyGroup>
   <Choose>
     <When Condition=" '$(Release)' != '' ">
@@ -18,7 +15,7 @@
     <Otherwise>
       <PropertyGroup>
         <!-- Prerelease version numbers are MAJOR.MINOR.0-pre-build###### -->
-        <VersionSuffix>-ci$(BUILD_BUILDID.PadLeft(6, '0'))</VersionSuffix>
+        <VersionSuffix>alpha.$(BUILD_BUILDID)</VersionSuffix>
       </PropertyGroup>
     </Otherwise>
   </Choose>
