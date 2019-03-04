@@ -15,7 +15,7 @@
     <Otherwise>
       <PropertyGroup>
         <!-- Prerelease version numbers are MAJOR.MINOR.0-pre-build###### -->
-        <VersionSuffix>alpha.$(BUILD_BUILDID)</VersionSuffix>
+        <VersionSuffix>alpha$(BUILD_BUILDID.PadLeft(4, '0'))</VersionSuffix>
       </PropertyGroup>
     </Otherwise>
   </Choose>
