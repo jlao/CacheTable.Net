@@ -23,7 +23,7 @@ namespace CacheTable
         /// </summary>
         /// <param name="rows">The number of rows.</param>
         /// <param name="columns">The number of columns per row.</param>
-        /// <param name="concurrency">The number of locks to stripe rows across.</param>
+        /// <param name="concurrency">The number of locks to use for synchronization.</param>
         public ConcurrentCacheTable(int rows, int columns, int concurrency)
         {
             this.table = new CacheTableInternal<TKey, TValue>(rows, columns);
