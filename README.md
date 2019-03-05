@@ -2,6 +2,7 @@
 
 CacheTable.Net implements a simple data structure suitable for use as a cache.
 
+[![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/CacheTable.Net.svg)](https://www.nuget.org/packages/CacheTable.Net/)
 [![Build Status](https://jlao.visualstudio.com/CacheTable.Net/_apis/build/status/jlao.CacheTable.Net?branchName=master)](https://jlao.visualstudio.com/CacheTable.Net/_build/latest?definitionId=1&branchName=master)
 
 ## Cache tables
