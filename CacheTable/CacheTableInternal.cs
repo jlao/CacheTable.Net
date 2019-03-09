@@ -4,9 +4,25 @@ using System.Diagnostics;
 
 namespace CacheTable
 {
+    struct Entry<K, V>
+    {
+        public K Key { get; set; }
+        public V Value { get; set; }
+        public bool IsSet { get; set; }
+
+        public void Clear()
+        {
+            this.Key = default(K);
+            this.Value = default(V);
+            this.IsSet = false;
+        }
+
+        public KeyValuePair<K, V> CreateKvp() => new KeyValuePair<K, V>(this.Key, this.Value);
+    }
+
     struct CacheTableInternal<TKey, TValue>
     {
-        public readonly KeyValuePair<TKey, TValue>?[] table;
+        public readonly Entry<TKey, TValue>[] table;
         public readonly int numRows;
         public readonly int numColumns;
 
@@ -14,14 +30,14 @@ namespace CacheTable
         {
             this.numRows = numRows;
             this.numColumns = numColumns;
-            this.table = new KeyValuePair<TKey, TValue>?[numRows * numColumns];
+            this.table = new Entry<TKey, TValue>[numRows * numColumns];
         }
 
         public void Clear()
         {
             for (int i = 0; i < this.table.Length; i++)
             {
-                this.table[i] = null;
+                this.table[i].Clear();
             }
         }
 
@@ -43,7 +59,7 @@ namespace CacheTable
             (int rowStart, int rowEnd) = this.GetRowRange(row);
             for (int i = rowStart; i < rowEnd; i++)
             {
-                if (this.table[i].HasValue && this.table[i].Value.Key.Equals(key))
+                if (this.table[i].IsSet && this.table[i].Key.Equals(key))
                 {
                     return i;
                 }
@@ -57,9 +73,8 @@ namespace CacheTable
             int loc = this.FindEntry(key, row);
             if (loc >= 0)
             {
-                KeyValuePair<TKey, TValue>? item = table[loc];
-                Debug.Assert(item.HasValue, "item is null");
-                value = item.Value.Value;
+                Debug.Assert(table[loc].IsSet, "item is null");
+                value = table[loc].Value;
                 return true;
             }
 
@@ -75,7 +90,7 @@ namespace CacheTable
                 return false;
             }
 
-            this.table[loc] = null;
+            this.table[loc].Clear();
             return true;
         }
 
@@ -83,9 +98,9 @@ namespace CacheTable
         {
             for (int i = 0; i < this.table.Length; i++)
             {
-                if (this.table[i].HasValue)
+                if (this.table[i].IsSet)
                 {
-                    yield return this.table[i].Value;
+                    yield return this.table[i].CreateKvp();
                 }
             }
         }
@@ -94,16 +109,15 @@ namespace CacheTable
         public bool Set(TKey key, TValue value, int row, Random rng)
         {
             (int rowStart, int rowEnd) = this.GetRowRange(row);
-            var kvp = new KeyValuePair<TKey, TValue>(key, value);
             int empty = -1;
 
             for (int i = rowStart; i < rowEnd; i++)
             {
-                if (this.table[i].HasValue)
+                if (this.table[i].IsSet)
                 {
-                    if (this.table[i].Value.Key.Equals(key))
+                    if (this.table[i].Key.Equals(key))
                     {
-                        this.table[i] = kvp;
+                        this.table[i].Value = value;
                         return false;
                     }
                 }
@@ -115,17 +129,21 @@ namespace CacheTable
 
             if (empty >= 0)
             {
-                Debug.Assert(!this.table[empty].HasValue);
+                Debug.Assert(!this.table[empty].IsSet);
 
-                this.table[empty] = kvp;
+                this.table[empty].Key = key;
+                this.table[empty].Value = value;
+                this.table[empty].IsSet = true;
                 return true;
             }
 
             // No empty slot, randomly replace.
             int loc = rowStart + rng.Next(this.numColumns);
-            Debug.Assert(this.table[loc].HasValue);
-            Debug.Assert(!this.table[loc].Value.Key.Equals(key));
-            this.table[loc] = kvp;
+            Debug.Assert(this.table[loc].IsSet);
+            Debug.Assert(!this.table[loc].Key.Equals(key));
+            this.table[loc].Key = key;
+            this.table[loc].Value = value;
+
             return false;
         }
     }

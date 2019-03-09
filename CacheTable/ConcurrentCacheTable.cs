@@ -175,9 +175,9 @@ namespace CacheTable
                         (int rowStart, int rowEnd) = this.table.GetRowRange(row);
                         for (int i = rowStart; i < rowEnd; i++)
                         {
-                            if (this.table.table[i].HasValue)
+                            if (this.table.table[i].IsSet)
                             {
-                                yield return this.table.table[i].Value;
+                                yield return this.table.table[i].CreateKvp();
                             }
                         }
                     }
