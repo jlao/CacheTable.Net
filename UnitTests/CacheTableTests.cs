@@ -3,15 +3,15 @@ using Xunit.Abstractions;
 
 namespace UnitTests
 {
-    public class CacheTableTests : CacheTableTestBase<CacheTable<int, int>>
+    public class CacheTableTests : CacheTableTestBase
     {
         public CacheTableTests(ITestOutputHelper output) : base(output)
         {
         }
 
-        protected override CacheTable<int, int> CreateTable(int numRows, int numColumns)
+        protected override ICacheTable<TKey, TValue> CreateTable<TKey, TValue>(int numRows, int numColumns)
         {
-            return new CacheTable<int, int>(numRows, numColumns);
+            return new CacheTable<TKey, TValue>(numRows, numColumns);
         }
     }
 }

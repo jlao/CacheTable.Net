@@ -6,21 +6,21 @@ using Xunit.Abstractions;
 
 namespace UnitTests
 {
-    public class ConcurrentCacheTableTests : CacheTableTestBase<ConcurrentCacheTable<int, int>>
+    public class ConcurrentCacheTableTests : CacheTableTestBase
     {
         public ConcurrentCacheTableTests(ITestOutputHelper output) : base(output)
         {
         }
 
-        protected override ConcurrentCacheTable<int, int> CreateTable(int numRows, int numColumns)
+        protected override ICacheTable<TKey, TValue> CreateTable<TKey, TValue>(int numRows, int numColumns)
         {
-            return new ConcurrentCacheTable<int, int>(numRows, numColumns, 3);
+            return new ConcurrentCacheTable<TKey, TValue>(numRows, numColumns, 3);
         }
 
         [Fact]
         public async Task ConcurrentWrites()
         {
-            var table = CreateTable(5, 4);
+            var table = this.CreateTable<int, int>(5, 4);
 
             const int numWrites = 1000;
 
