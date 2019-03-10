@@ -3,7 +3,6 @@ using System;
 using BenchmarkDotNet.Attributes;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
 
 namespace Benchmark
 {
@@ -11,11 +10,6 @@ namespace Benchmark
     [RPlotExporter, RankColumn]
     public class HashCollisions
     {
-        private static readonly WrappedInt Zero = 0;
-        private static readonly WrappedInt One = 1;
-        private static readonly WrappedInt Two = 2;
-        private static readonly WrappedInt Three = 3;
-
         private readonly CacheTable<WrappedInt, int> cacheTable = new CacheTable<WrappedInt, int>(10, 4);
         private readonly ConcurrentCacheTable<WrappedInt, int> concurrentCacheTable = new ConcurrentCacheTable<WrappedInt, int>(10, 4, Environment.ProcessorCount);
         private readonly Dictionary<WrappedInt, int> dictionary = new Dictionary<WrappedInt, int>();
@@ -37,37 +31,25 @@ namespace Benchmark
         [Benchmark]
         public void CacheTable()
         {
-            this.cacheTable[Zero] = 0;
-            this.cacheTable[One] = 1;
-            this.cacheTable[Two] = 2;
-            this.cacheTable[Three] = 3;
+            for (int i = 0; i < 4; i++) this.cacheTable[i] = i;
         }
 
         [Benchmark]
         public void ConcurrentCacheTable()
         {
-            this.concurrentCacheTable[Zero] = 0;
-            this.concurrentCacheTable[One] = 1;
-            this.concurrentCacheTable[Two] = 2;
-            this.concurrentCacheTable[Three] = 3;
+            for (int i = 0; i < 4; i++) this.concurrentCacheTable[i] = i;
         }
 
         [Benchmark(Baseline = true)]
         public void Dictionary()
         {
-            this.dictionary[Zero] = 0;
-            this.dictionary[One] = 1;
-            this.dictionary[Two] = 2;
-            this.dictionary[Three] = 3;
+            for (int i = 0; i < 4; i++) this.dictionary[i] = i;
         }
 
         [Benchmark]
         public void ConcurrentDictionary()
         {
-            this.concurrentDictionary[Zero] = 0;
-            this.concurrentDictionary[One] = 1;
-            this.concurrentDictionary[Two] = 2;
-            this.concurrentDictionary[Three] = 3;
+            for (int i = 0; i < 4; i++) this.concurrentDictionary[i] = i;
         }
     }
 }
