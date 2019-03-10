@@ -8,7 +8,7 @@ namespace Benchmark
 {
     [CoreJob]
     [RPlotExporter, RankColumn]
-    public class SetSingleItem
+    public class SetSingleInt
     {
         private readonly CacheTable<int, int> cacheTable = new CacheTable<int, int>(10, 4);
         private readonly ConcurrentCacheTable<int, int> concurrentCacheTable = new ConcurrentCacheTable<int, int>(10, 4, Environment.ProcessorCount);
