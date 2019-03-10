@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace UnitTests
 {
-    public abstract class CacheTableTestBase<TCacheTable> where TCacheTable : ICacheTable<int, int>
+    public abstract class CacheTableTestBase
     {
         protected ITestOutputHelper output;
 
@@ -17,12 +17,12 @@ namespace UnitTests
             this.output = output;
         }
 
-        protected abstract TCacheTable CreateTable(int numRows, int numColumns);
+        protected abstract ICacheTable<TKey, TValue> CreateTable<TKey, TValue>(int numRows, int numColumns);
 
         [Fact]
         public void SetAndTryGetValue()
         {
-            var table = this.CreateTable(10, 4);
+            var table = this.CreateTable<int, int>(10, 4);
             table[1] = 2;
             table.TryGetValue(1, out int val).Should().BeTrue();
             val.Should().Be(2);
@@ -31,7 +31,7 @@ namespace UnitTests
         [Fact]
         public void TryGetNonExistentValue()
         {
-            var table = this.CreateTable(10, 4);
+            var table = this.CreateTable<int, int>(10, 4);
             table.TryGetValue(1, out int val).Should().BeFalse();
             val.Should().Be(default(int));
         }
@@ -39,7 +39,7 @@ namespace UnitTests
         [Fact]
         public void SetAndIndex()
         {
-            var table = this.CreateTable(10, 4);
+            var table = this.CreateTable<int, int>(10, 4);
             table[1] = 2;
             table[1].Should().Be(2);
         }
@@ -47,7 +47,7 @@ namespace UnitTests
         [Fact]
         public void Update()
         {
-            var table = this.CreateTable(10, 4);
+            var table = this.CreateTable<int, int>(10, 4);
             
             for (int i = 0; i < 4; i++)
             {
@@ -72,7 +72,7 @@ namespace UnitTests
         [Fact]
         public void IndexNonExistentKeyThrows()
         {
-            var table = this.CreateTable(10, 4);
+            var table = this.CreateTable<int, int>(10, 4);
             Action act = () => Console.WriteLine(table[0]);
             act.Should().Throw<KeyNotFoundException>()
                 .WithMessage("No value found for 0");
@@ -81,7 +81,7 @@ namespace UnitTests
         [Fact]
         public void ContainsKey()
         {
-            var table = this.CreateTable(10, 4);
+            var table = this.CreateTable<int, int>(10, 4);
             table.ContainsKey(0).Should().BeFalse();
             table[0] = 1;
             table.ContainsKey(0).Should().BeTrue();
@@ -90,7 +90,7 @@ namespace UnitTests
         [Fact]
         public void Remove()
         {
-            var table = this.CreateTable(10, 4);
+            var table = this.CreateTable<int, int>(10, 4);
             table[1] = 2;
             table.Remove(1).Should().BeTrue();
             table.TryGetValue(1, out int val).Should().BeFalse();
@@ -103,7 +103,7 @@ namespace UnitTests
         {
             const int numInserts = 40;
 
-            var table = this.CreateTable(10, 4);
+            var table = this.CreateTable<int, int>(10, 4);
             for (int i = 0; i < numInserts; i++)
             {
                 table[i] = i;
@@ -123,7 +123,7 @@ namespace UnitTests
         [Fact]
         public void Count()
         {
-            var table = this.CreateTable(10, 4);
+            var table = this.CreateTable<int, int>(10, 4);
             table.Count.Should().Be(0);
 
             for (int i = 0; i < 4; i++)
@@ -142,7 +142,7 @@ namespace UnitTests
         [Fact]
         public void Enumerate()
         {
-            var table = this.CreateTable(10, 4);
+            var table = this.CreateTable<int, int>(10, 4);
             var rng = new Random();
             List<KeyValuePair<int, int>> expected = new List<KeyValuePair<int, int>>();
 
@@ -160,7 +160,7 @@ namespace UnitTests
         [Fact]
         public void InsertOnFullTableOverwrites()
         {
-            var table = this.CreateTable(5, 4);
+            var table = this.CreateTable<int, int>(5, 4);
 
             int i = 0;
             do
@@ -182,6 +182,29 @@ namespace UnitTests
             after.ExceptWith(before);
             after.Count.Should().Be(1);
             after.First().Should().Be(i);
+        }
+
+        [Theory]
+        [InlineData(4)]
+        [InlineData(7)]
+        public void ResolvesHashCollisions(int numColumns)
+        {
+            var table = this.CreateTable<BadHashCode, int>(5, numColumns);
+
+            for (int i = 0; i < numColumns; i++)
+            {
+                table[i] = i;
+            }
+
+            for (int i = 0; i < numColumns; i++)
+            {
+                table[i].Should().Be(i);
+            }
+
+            // This is going to overwrite a value
+            table[numColumns] = numColumns;
+            table[numColumns].Should().Be(numColumns);
+            table.Count.Should().Be(numColumns);
         }
     }
 }
