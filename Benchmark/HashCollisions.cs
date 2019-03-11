@@ -15,41 +15,31 @@ namespace Benchmark
         private readonly Dictionary<WrappedInt, int> dictionary = new Dictionary<WrappedInt, int>();
         private readonly ConcurrentDictionary<WrappedInt, int> concurrentDictionary = new ConcurrentDictionary<WrappedInt, int>();
 
-        struct WrappedInt : IEquatable<WrappedInt>
-        {
-            public int Value;
-
-            public bool Equals(WrappedInt other) => this.Value == other.Value;
-
-            public override int GetHashCode() => 42;
-
-            public override bool Equals(object obj) => this.Equals((WrappedInt)obj);
-
-            public static implicit operator WrappedInt(int i) => new WrappedInt { Value = i };
-        }
+        [Params(32, 64)]
+        public int N;
 
         [Benchmark]
         public void CacheTable()
         {
-            for (int i = 0; i < 4; i++) this.cacheTable[i] = i;
-        }
-
-        [Benchmark]
-        public void ConcurrentCacheTable()
-        {
-            for (int i = 0; i < 4; i++) this.concurrentCacheTable[i] = i;
+            for (int i = 0; i < this.N; i++) this.cacheTable[i] = i;
         }
 
         [Benchmark(Baseline = true)]
         public void Dictionary()
         {
-            for (int i = 0; i < 4; i++) this.dictionary[i] = i;
+            for (int i = 0; i < this.N; i++) this.dictionary[i] = i;
+        }
+
+        [Benchmark]
+        public void ConcurrentCacheTable()
+        {
+            for (int i = 0; i < this.N; i++) this.concurrentCacheTable[i] = i;
         }
 
         [Benchmark]
         public void ConcurrentDictionary()
         {
-            for (int i = 0; i < 4; i++) this.concurrentDictionary[i] = i;
+            for (int i = 0; i < this.N; i++) this.concurrentDictionary[i] = i;
         }
     }
 }
