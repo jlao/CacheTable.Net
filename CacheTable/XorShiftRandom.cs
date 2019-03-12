@@ -6,7 +6,7 @@ namespace CacheTable
     public class XorShiftRandom
     {
         [ThreadStatic]
-        private static readonly Random seedRng = new Random();
+        private static Random seedRng;
 
         private uint state;
 
@@ -32,6 +32,11 @@ namespace CacheTable
 
         private static uint GetNonZeroSeed()
         {
+            if (seedRng == null)
+            {
+                seedRng = new Random();
+            }
+
             while (true)
             {
                 uint seed = (uint)seedRng.Next();
