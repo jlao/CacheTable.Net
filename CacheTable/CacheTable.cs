@@ -14,7 +14,7 @@ namespace CacheTable
     {
         private CacheTableInternal<TKey, TValue> table;
         private int count;
-        private readonly Random rng = new Random();
+        private readonly XorShiftRandom rng = new XorShiftRandom();
 
         /// <summary>
         /// Creates a set associative cache with specified number of rows and columns.

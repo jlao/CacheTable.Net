@@ -106,7 +106,7 @@ namespace CacheTable
         }
 
         // Returns true if item was inserted into empty slot. False otherwise.
-        public bool Set(TKey key, TValue value, int row, Random rng)
+        public bool Set(TKey key, TValue value, int row, XorShiftRandom rng)
         {
             (int rowStart, int rowEnd) = this.GetRowRange(row);
             int empty = -1;

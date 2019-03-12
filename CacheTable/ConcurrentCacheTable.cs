@@ -15,7 +15,7 @@ namespace CacheTable
     {
         private readonly CacheTableInternal<TKey, TValue> table;
         private readonly object[] lockObjects;
-        private readonly Random[] rngs;
+        private readonly XorShiftRandom[] rngs;
         private readonly int[] counts;
 
         /// <summary>
@@ -35,10 +35,10 @@ namespace CacheTable
                 this.lockObjects[i] = new object();
             }
 
-            this.rngs = new Random[concurrency];
+            this.rngs = new XorShiftRandom[concurrency];
             for (int i = 0; i < concurrency; i++)
             {
-                this.rngs[i] = new Random();
+                this.rngs[i] = new XorShiftRandom();
             }
         }
 
@@ -248,7 +248,7 @@ namespace CacheTable
             return this.lockObjects[row % this.lockObjects.Length];
         }
 
-        private Random GetRng(int row)
+        private XorShiftRandom GetRng(int row)
         {
             return this.rngs[row % this.rngs.Length];
         }
