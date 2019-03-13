@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace CacheTable
 {
@@ -10,6 +11,7 @@ namespace CacheTable
         public V Value { get; set; }
         public bool IsSet { get; set; }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear()
         {
             this.Key = default(K);
@@ -17,6 +19,7 @@ namespace CacheTable
             this.IsSet = false;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public KeyValuePair<K, V> CreateKvp() => new KeyValuePair<K, V>(this.Key, this.Value);
     }
 
@@ -33,6 +36,7 @@ namespace CacheTable
             this.table = new Entry<TKey, TValue>[numRows * numColumns];
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear()
         {
             for (int i = 0; i < this.table.Length; i++)
@@ -41,12 +45,14 @@ namespace CacheTable
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int FindRow(TKey key)
         {
             int hash = key.GetHashCode() & 0x7FFFFFFF;
             return hash % this.numRows;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public (int start, int end) GetRowRange(int row)
         {
             int start = row * this.numColumns;
@@ -54,6 +60,7 @@ namespace CacheTable
             return (start, end);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int FindEntry(TKey key, int row)
         {
             (int rowStart, int rowEnd) = this.GetRowRange(row);
@@ -68,6 +75,7 @@ namespace CacheTable
             return -1;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(TKey key, int row, out TValue value)
         {
             int loc = this.FindEntry(key, row);
@@ -82,6 +90,7 @@ namespace CacheTable
             return false;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Remove(TKey key, int row)
         {
             int loc = this.FindEntry(key, row);
@@ -94,6 +103,7 @@ namespace CacheTable
             return true;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             for (int i = 0; i < this.table.Length; i++)
@@ -106,6 +116,7 @@ namespace CacheTable
         }
 
         // Returns true if item was inserted into empty slot. False otherwise.
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Set(TKey key, TValue value, int row, XorShiftRandom rng)
         {
             (int rowStart, int rowEnd) = this.GetRowRange(row);
